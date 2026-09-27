@@ -1,4 +1,4 @@
-# Desarrollo de Software - Ejercicios
+# Desarrollo de Software - Ejercicios integradores
 
 Proyecto de práctica sobre un sistema de reservas turísticas (vuelos, alojamientos,
 usuarios). La lógica de negocio se resuelve **en la capa de servicio** (`service`) y,
