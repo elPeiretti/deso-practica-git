@@ -1,8 +1,8 @@
-## Exercises completed
+## Ejercicios resueltos
 
-Check off **only** the exercises you implemented and want graded. CI will require the
-checked ones to pass all their tests. Unchecked exercises are skipped — they won't
-count against you even if their tests still fail.
+Marcar **únicamente** los ejercicios implementados que se desea que sean corregidos. El CI
+exigirá que los marcados pasen todos sus tests. Los ejercicios sin marcar se ignoran y no
+suman en contra, aunque sus tests continúen fallando.
 
 - [ ] Ejercicio 1 — Filtrado y ordenamiento por precio
 - [ ] Ejercicio 2 — Agrupamiento y promedio por compañía
@@ -18,6 +18,7 @@ count against you even if their tests still fail.
 - [ ] Ejercicio 12 — Validación por lotes con acumulación de errores
 
 <!--
-Do not remove the "Ejercicio N" text from a line above, and don't change the
-numbers — CI matches on that text to know which exercise each checkbox refers to.
+No debe eliminarse el texto "Ejercicio N" de ninguna línea anterior, ni modificarse
+los números: el CI utiliza ese texto para determinar a qué ejercicio corresponde
+cada casillero.
 -->
