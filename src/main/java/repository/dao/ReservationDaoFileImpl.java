@@ -35,12 +35,13 @@ public class ReservationDaoFileImpl implements ReservationDao {
   @Override
   public void save(Reservation reservation) throws DataAccessException {
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
-      String line = String.format(
-          "%s,%s,%s,%s\n",
-          reservation.getId(),
-          reservation.getService().getId(),
-          reservation.getOwner().getId(),
-          reservation.getDate());
+      String line =
+          String.format(
+              "%s,%s,%s,%s\n",
+              reservation.getId(),
+              reservation.getService().getId(),
+              reservation.getOwner().getId(),
+              reservation.getDate());
       bw.write(line);
     } catch (IOException e) {
       throw new DataAccessException("Error al guardar la reserva", e);

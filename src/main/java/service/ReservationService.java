@@ -36,18 +36,23 @@ public class ReservationService {
   public ReservationResponse createReservation(CreateReservationRequest request)
       throws DataAccessException, UserNotFoundException, FlightNotFoundException {
     // 1. Resolver entidades de dominio desde los datos del DTO
-    User user = userDao.findByUsername(request.username())
-        .orElseThrow(() -> new UserNotFoundException(request.username()));
-    TouristService service = flightDao.findByNumber(request.flightNumber())
-        .orElseThrow(() -> new FlightNotFoundException(request.flightNumber()));
+    User user =
+        userDao
+            .findByUsername(request.username())
+            .orElseThrow(() -> new UserNotFoundException(request.username()));
+    TouristService service =
+        flightDao
+            .findByNumber(request.flightNumber())
+            .orElseThrow(() -> new FlightNotFoundException(request.flightNumber()));
 
     // 2. Construir la reserva (lógica de dominio)
-    Reservation reservation = new Reservation.Builder()
-        .id((long) (Math.random() * 1000))
-        .owner(user)
-        .service(service)
-        .date(request.date())
-        .build();
+    Reservation reservation =
+        new Reservation.Builder()
+            .id((long) (Math.random() * 1000))
+            .owner(user)
+            .service(service)
+            .date(request.date())
+            .build();
 
     reservationDao.save(reservation);
 
@@ -57,26 +62,20 @@ public class ReservationService {
         user.getUsername(),
         service.toString(),
         reservation.calculatePrice(),
-        request.date()
-    );
+        request.date());
   }
 
   // Ejercicio 1
   public List<Reservation> getReservationsByUser(
-      List<Reservation> reservations,
-      String username,
-      UserDao userDao
-  ) throws UserNotFoundException, DataAccessException {
+      List<Reservation> reservations, String username, UserDao userDao)
+      throws UserNotFoundException, DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
   }
 
   // Ejercicio 3
   public List<Reservation> getTopNMostExpensive(
-      ReservationDao reservationDao,
-      Instant from,
-      Instant to,
-      int n
-  ) throws InvalidDateRangeException, DataAccessException {
+      ReservationDao reservationDao, Instant from, Instant to, int n)
+      throws InvalidDateRangeException, DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 3: implement getTopNMostExpensive");
   }
 
@@ -92,8 +91,11 @@ public class ReservationService {
       Instant date,
       UserDao userDao,
       FlightDao flightDao,
-      ReservationDao reservationDao
-  ) throws UserNotFoundException, FlightNotFoundException, InvalidDateRangeException, DataAccessException {
+      ReservationDao reservationDao)
+      throws UserNotFoundException,
+          FlightNotFoundException,
+          InvalidDateRangeException,
+          DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 7: implement createReservation");
   }
 
@@ -101,33 +103,29 @@ public class ReservationService {
   public Reservation addReservationIfNotDuplicate(
       List<Reservation> existingReservations,
       Reservation newReservation,
-      ReservationDao reservationDao
-  ) throws DuplicateReservationException, DataAccessException {
+      ReservationDao reservationDao)
+      throws DuplicateReservationException, DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 8: implement addReservationIfNotDuplicate");
   }
 
   // Ejercicio 10
   public void exportReservationsToCsv(
-      List<Reservation> reservations,
-      ReservationExportDao exportDao
-  ) throws DataAccessException {
+      List<Reservation> reservations, ReservationExportDao exportDao) throws DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 10: implement exportReservationsToCsv");
   }
 
   // Ejercicio 11
   public List<UserSummaryDTO> getUserReservationSummaries(
-      List<Reservation> reservations,
-      UserDao userDao
-  ) throws UserNotFoundException, DataAccessException {
+      List<Reservation> reservations, UserDao userDao)
+      throws UserNotFoundException, DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 11: implement getUserReservationSummaries");
   }
 
   // Ejercicio 12
   public ValidationResultDTO validateReservationCandidates(
-      List<Pair<String, String>> candidates,
-      UserDao userDao,
-      FlightDao flightDao
-  ) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 12: implement validateReservationCandidates");
+      List<Pair<String, String>> candidates, UserDao userDao, FlightDao flightDao)
+      throws DataAccessException {
+    throw new UnsupportedOperationException(
+        "Ejercicio 12: implement validateReservationCandidates");
   }
 }

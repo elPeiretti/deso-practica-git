@@ -9,5 +9,4 @@ public record UserSummaryDTO(
     int reservationCount,
     double totalSpent,
     TouristService mostExpensiveService,
-    Instant mostRecentReservationDate
-) {}
+    Instant mostRecentReservationDate) {}

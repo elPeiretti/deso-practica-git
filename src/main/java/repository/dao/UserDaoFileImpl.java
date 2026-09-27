@@ -14,8 +14,7 @@ public class UserDaoFileImpl implements UserDao {
   private static UserDaoFileImpl instance;
   private final File file = new File("users.txt");
 
-  private UserDaoFileImpl() {
-  }
+  private UserDaoFileImpl() {}
 
   // singleton
   public static synchronized UserDaoFileImpl getInstance() {
@@ -42,10 +41,7 @@ public class UserDaoFileImpl implements UserDao {
         return Optional.empty();
       }
 
-      User user = User.builder()
-          .id(userId)
-          .username(username)
-          .build();
+      User user = User.builder().id(userId).username(username).build();
 
       return Optional.of(user);
     } catch (IOException e) {

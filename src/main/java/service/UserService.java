@@ -17,25 +17,22 @@ public class UserService {
     this.userDao = userDao;
   }
 
-  public UserResponse getByUsername(String username) throws UserNotFoundException, DataAccessException {
-    User user = userDao.findByUsername(username)
-        .orElseThrow(() -> new UserNotFoundException(username));
+  public UserResponse getByUsername(String username)
+      throws UserNotFoundException, DataAccessException {
+    User user =
+        userDao.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
     return new UserResponse(user.getId(), user.getUsername());
   }
 
   // Ejercicio 6
-  public User getValidatedUser(
-      String username,
-      UserDao userDao
-  ) throws UserNotFoundException, IncompleteUserException, DataAccessException {
+  public User getValidatedUser(String username, UserDao userDao)
+      throws UserNotFoundException, IncompleteUserException, DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 6: implement getValidatedUser");
   }
 
   // Ejercicio 9
-  public List<User> getUsersPresentInFileAndDao(
-      FileUserDao fileUserDao,
-      UserDao userDao
-  ) throws DataAccessException {
+  public List<User> getUsersPresentInFileAndDao(FileUserDao fileUserDao, UserDao userDao)
+      throws DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 9: implement getUsersPresentInFileAndDao");
   }
 }

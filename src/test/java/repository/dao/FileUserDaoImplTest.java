@@ -17,8 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileUserDaoImplTest {
 
-  @TempDir
-  File tempDir;
+  @TempDir File tempDir;
 
   @Test
   void should_returnAllValidUsers_when_fileHasValidLines() throws Exception {

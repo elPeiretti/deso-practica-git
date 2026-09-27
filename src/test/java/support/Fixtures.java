@@ -12,8 +12,7 @@ import java.util.UUID;
 
 public final class Fixtures {
 
-  private Fixtures() {
-  }
+  private Fixtures() {}
 
   public static Location location(String country, String city) {
     return new Location(UUID.randomUUID().toString(), country, city, "Main St 123", "Home");
@@ -32,7 +31,8 @@ public final class Fixtures {
         .build();
   }
 
-  public static Flight flight(String number, String company, String airline, double length, double litersPerKm) {
+  public static Flight flight(
+      String number, String company, String airline, double length, double litersPerKm) {
     Flight flight = new Flight(company);
     flight.setNumber(number);
     flight.setAirline(airline);
@@ -42,7 +42,12 @@ public final class Fixtures {
   }
 
   public static Flight flightWithArrival(
-      String number, String company, String airline, double length, double litersPerKm, Location arrival) {
+      String number,
+      String company,
+      String airline,
+      double length,
+      double litersPerKm,
+      Location arrival) {
     Flight flight = flight(number, company, airline, length, litersPerKm);
     flight.setArrivalInfo(arrival);
     return flight;
@@ -50,17 +55,13 @@ public final class Fixtures {
 
   public static Accommodation accommodation(
       String company, double pricePerNight, int guestCount, int nightsCount, Location location) {
-    Accommodation accommodation = new Accommodation(company, pricePerNight, guestCount, nightsCount);
+    Accommodation accommodation =
+        new Accommodation(company, pricePerNight, guestCount, nightsCount);
     accommodation.setLocation(location);
     return accommodation;
   }
 
   public static Reservation reservation(Long id, Instant date, TouristService service, User owner) {
-    return new Reservation.Builder()
-        .id(id)
-        .date(date)
-        .service(service)
-        .owner(owner)
-        .build();
+    return new Reservation.Builder().id(id).date(date).service(service).owner(owner).build();
   }
 }

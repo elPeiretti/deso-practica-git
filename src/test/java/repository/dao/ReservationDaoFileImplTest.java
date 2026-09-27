@@ -18,8 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReservationDaoFileImplTest {
 
-  @TempDir
-  File tempDir;
+  @TempDir File tempDir;
 
   private ReservationDaoFileImpl reservationDao;
 

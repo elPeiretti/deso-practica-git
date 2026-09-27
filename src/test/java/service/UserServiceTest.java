@@ -26,10 +26,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 
-  @Mock
-  private UserDao userDao;
-  @Mock
-  private FileUserDao fileUserDao;
+  @Mock private UserDao userDao;
+  @Mock private FileUserDao fileUserDao;
 
   private UserService userService;
 
@@ -78,7 +76,8 @@ class UserServiceTest {
     void should_throwUserNotFoundException_when_userDoesNotExist() throws Exception {
       when(userDao.findByUsername("ghost")).thenReturn(Optional.empty());
 
-      assertThrows(UserNotFoundException.class, () -> userService.getValidatedUser("ghost", userDao));
+      assertThrows(
+          UserNotFoundException.class, () -> userService.getValidatedUser("ghost", userDao));
     }
 
     @Test
@@ -86,7 +85,8 @@ class UserServiceTest {
       User user = Fixtures.user("fede", null);
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(user));
 
-      assertThrows(IncompleteUserException.class, () -> userService.getValidatedUser("fede", userDao));
+      assertThrows(
+          IncompleteUserException.class, () -> userService.getValidatedUser("fede", userDao));
     }
 
     @Test
@@ -95,7 +95,8 @@ class UserServiceTest {
       User user = Fixtures.user("fede", location);
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(user));
 
-      assertThrows(IncompleteUserException.class, () -> userService.getValidatedUser("fede", userDao));
+      assertThrows(
+          IncompleteUserException.class, () -> userService.getValidatedUser("fede", userDao));
     }
 
     @Test
@@ -104,7 +105,8 @@ class UserServiceTest {
       User user = Fixtures.user("fede", location);
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(user));
 
-      assertThrows(IncompleteUserException.class, () -> userService.getValidatedUser("fede", userDao));
+      assertThrows(
+          IncompleteUserException.class, () -> userService.getValidatedUser("fede", userDao));
     }
 
     @Test
@@ -158,7 +160,9 @@ class UserServiceTest {
     void should_propagateDataAccessException_when_fileUserDaoFails() throws Exception {
       when(fileUserDao.findAll()).thenThrow(new DataAccessException("boom"));
 
-      assertThrows(DataAccessException.class, () -> userService.getUsersPresentInFileAndDao(fileUserDao, userDao));
+      assertThrows(
+          DataAccessException.class,
+          () -> userService.getUsersPresentInFileAndDao(fileUserDao, userDao));
     }
 
     @Test

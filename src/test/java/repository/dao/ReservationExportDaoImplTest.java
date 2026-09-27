@@ -20,8 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ReservationExportDaoImplTest {
 
-  @TempDir
-  File tempDir;
+  @TempDir File tempDir;
 
   @Test
   void should_writeHeaderAndRow_when_reservationsProvided() throws Exception {
@@ -35,8 +34,9 @@ class ReservationExportDaoImplTest {
 
     List<String> lines = readLines(file);
     assertEquals("reservationId,date,ownerUsername,serviceCompany,calculatedPrice", lines.get(0));
-    assertEquals(String.format(
-        "971,%s,fede,AeroLine SA,%.2f", date, reservation.calculatePrice()), lines.get(1));
+    assertEquals(
+        String.format("971,%s,fede,AeroLine SA,%.2f", date, reservation.calculatePrice()),
+        lines.get(1));
   }
 
   @Test
@@ -67,7 +67,8 @@ class ReservationExportDaoImplTest {
   void should_throwDataAccessException_when_fileCannotBeWritten() {
     File directoryAsFile = tempDir;
 
-    assertThrows(DataAccessException.class,
+    assertThrows(
+        DataAccessException.class,
         () -> new ReservationExportDaoImpl(directoryAsFile).exportAll(List.of()));
   }
 

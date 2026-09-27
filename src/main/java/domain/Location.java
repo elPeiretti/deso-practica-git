@@ -24,5 +24,4 @@ public class Location implements Identifiable {
   public String getId() {
     return id;
   }
-
 }

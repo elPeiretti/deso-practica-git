@@ -41,14 +41,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ReservationServiceTest {
 
-  @Mock
-  private UserDao userDao;
-  @Mock
-  private FlightDao flightDao;
-  @Mock
-  private ReservationDao reservationDao;
-  @Mock
-  private ReservationExportDao exportDao;
+  @Mock private UserDao userDao;
+  @Mock private FlightDao flightDao;
+  @Mock private ReservationDao reservationDao;
+  @Mock private ReservationExportDao exportDao;
 
   private ReservationService reservationService;
 
@@ -61,7 +57,8 @@ class ReservationServiceTest {
   class GetReservationsByUserTests {
 
     @Test
-    void should_returnReservationsSortedByPriceDescending_when_userHasMultipleReservations() throws Exception {
+    void should_returnReservationsSortedByPriceDescending_when_userHasMultipleReservations()
+        throws Exception {
       User user = Fixtures.user("fede");
       Flight cheap = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
       Flight expensive = Fixtures.flight("F2", "AeroLine", "AeroLine", 1000, 1);
@@ -69,14 +66,16 @@ class ReservationServiceTest {
       Reservation expensiveReservation = Fixtures.reservation(2L, Instant.now(), expensive, user);
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(user));
 
-      List<Reservation> result = reservationService.getReservationsByUser(
-          List.of(cheapReservation, expensiveReservation), "fede", userDao);
+      List<Reservation> result =
+          reservationService.getReservationsByUser(
+              List.of(cheapReservation, expensiveReservation), "fede", userDao);
 
       assertEquals(List.of(expensiveReservation, cheapReservation), result);
     }
 
     @Test
-    void should_excludeReservationsFromOtherUsers_when_listContainsMultipleUsers() throws Exception {
+    void should_excludeReservationsFromOtherUsers_when_listContainsMultipleUsers()
+        throws Exception {
       User fede = Fixtures.user("fede");
       User ana = Fixtures.user("ana");
       Flight flight = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
@@ -84,8 +83,9 @@ class ReservationServiceTest {
       Reservation anaReservation = Fixtures.reservation(2L, Instant.now(), flight, ana);
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(fede));
 
-      List<Reservation> result = reservationService.getReservationsByUser(
-          List.of(fedeReservation, anaReservation), "fede", userDao);
+      List<Reservation> result =
+          reservationService.getReservationsByUser(
+              List.of(fedeReservation, anaReservation), "fede", userDao);
 
       assertEquals(List.of(fedeReservation), result);
     }
@@ -94,7 +94,8 @@ class ReservationServiceTest {
     void should_returnEmptyList_when_reservationsListIsEmpty() throws Exception {
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(Fixtures.user("fede")));
 
-      List<Reservation> result = reservationService.getReservationsByUser(List.of(), "fede", userDao);
+      List<Reservation> result =
+          reservationService.getReservationsByUser(List.of(), "fede", userDao);
 
       assertTrue(result.isEmpty());
     }
@@ -103,7 +104,8 @@ class ReservationServiceTest {
     void should_throwUserNotFoundException_when_userDoesNotExist() throws Exception {
       when(userDao.findByUsername("ghost")).thenReturn(Optional.empty());
 
-      assertThrows(UserNotFoundException.class,
+      assertThrows(
+          UserNotFoundException.class,
           () -> reservationService.getReservationsByUser(List.of(), "ghost", userDao));
     }
 
@@ -111,7 +113,8 @@ class ReservationServiceTest {
     void should_propagateDataAccessException_when_userDaoFails() throws Exception {
       when(userDao.findByUsername("fede")).thenThrow(new DataAccessException("boom"));
 
-      assertThrows(DataAccessException.class,
+      assertThrows(
+          DataAccessException.class,
           () -> reservationService.getReservationsByUser(List.of(), "fede", userDao));
     }
   }
@@ -123,7 +126,8 @@ class ReservationServiceTest {
     private final Instant to = Instant.parse("2026-01-31T00:00:00Z");
 
     @Test
-    void should_returnTopNReservationsSortedDescending_when_moreThanNExistInRange() throws Exception {
+    void should_returnTopNReservationsSortedDescending_when_moreThanNExistInRange()
+        throws Exception {
       User user = Fixtures.user("fede");
       Flight cheap = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
       Flight medium = Fixtures.flight("F2", "AeroLine", "AeroLine", 500, 1);
@@ -133,7 +137,8 @@ class ReservationServiceTest {
       Reservation r3 = Fixtures.reservation(3L, from, expensive, user);
       when(reservationDao.findByDateRange(from, to)).thenReturn(List.of(r1, r2, r3));
 
-      List<Reservation> result = reservationService.getTopNMostExpensive(reservationDao, from, to, 2);
+      List<Reservation> result =
+          reservationService.getTopNMostExpensive(reservationDao, from, to, 2);
 
       assertEquals(List.of(r3, r2), result);
     }
@@ -145,14 +150,16 @@ class ReservationServiceTest {
       Reservation r1 = Fixtures.reservation(1L, from, flight, user);
       when(reservationDao.findByDateRange(from, to)).thenReturn(List.of(r1));
 
-      List<Reservation> result = reservationService.getTopNMostExpensive(reservationDao, from, to, 5);
+      List<Reservation> result =
+          reservationService.getTopNMostExpensive(reservationDao, from, to, 5);
 
       assertEquals(List.of(r1), result);
     }
 
     @Test
     void should_returnEmptyListWithoutCallingDao_when_nIsZero() throws Exception {
-      List<Reservation> result = reservationService.getTopNMostExpensive(reservationDao, from, to, 0);
+      List<Reservation> result =
+          reservationService.getTopNMostExpensive(reservationDao, from, to, 0);
 
       assertTrue(result.isEmpty());
       verifyNoInteractions(reservationDao);
@@ -160,7 +167,8 @@ class ReservationServiceTest {
 
     @Test
     void should_returnEmptyListWithoutCallingDao_when_nIsNegative() throws Exception {
-      List<Reservation> result = reservationService.getTopNMostExpensive(reservationDao, from, to, -1);
+      List<Reservation> result =
+          reservationService.getTopNMostExpensive(reservationDao, from, to, -1);
 
       assertTrue(result.isEmpty());
       verifyNoInteractions(reservationDao);
@@ -168,19 +176,22 @@ class ReservationServiceTest {
 
     @Test
     void should_throwInvalidDateRangeException_when_fromIsNull() {
-      assertThrows(InvalidDateRangeException.class,
+      assertThrows(
+          InvalidDateRangeException.class,
           () -> reservationService.getTopNMostExpensive(reservationDao, null, to, 3));
     }
 
     @Test
     void should_throwInvalidDateRangeException_when_toIsNull() {
-      assertThrows(InvalidDateRangeException.class,
+      assertThrows(
+          InvalidDateRangeException.class,
           () -> reservationService.getTopNMostExpensive(reservationDao, from, null, 3));
     }
 
     @Test
     void should_throwInvalidDateRangeException_when_fromIsAfterTo() {
-      assertThrows(InvalidDateRangeException.class,
+      assertThrows(
+          InvalidDateRangeException.class,
           () -> reservationService.getTopNMostExpensive(reservationDao, to, from, 3));
     }
 
@@ -188,7 +199,8 @@ class ReservationServiceTest {
     void should_propagateDataAccessException_when_daoFails() throws Exception {
       when(reservationDao.findByDateRange(from, to)).thenThrow(new DataAccessException("boom"));
 
-      assertThrows(DataAccessException.class,
+      assertThrows(
+          DataAccessException.class,
           () -> reservationService.getTopNMostExpensive(reservationDao, from, to, 3));
     }
   }
@@ -207,8 +219,9 @@ class ReservationServiceTest {
       Reservation newerReservation = Fixtures.reservation(1L, newer, flight1, user);
       Reservation olderReservation = Fixtures.reservation(2L, older, flight2, user);
 
-      Map<String, List<Reservation>> result = reservationService.groupReservationsByCountry(
-          List.of(newerReservation, olderReservation));
+      Map<String, List<Reservation>> result =
+          reservationService.groupReservationsByCountry(
+              List.of(newerReservation, olderReservation));
 
       assertEquals(List.of(olderReservation, newerReservation), result.get("Argentina"));
     }
@@ -219,14 +232,16 @@ class ReservationServiceTest {
       Flight flightWithoutArrival = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
       Reservation reservation = Fixtures.reservation(1L, Instant.now(), flightWithoutArrival, user);
 
-      Map<String, List<Reservation>> result = reservationService.groupReservationsByCountry(List.of(reservation));
+      Map<String, List<Reservation>> result =
+          reservationService.groupReservationsByCountry(List.of(reservation));
 
       assertTrue(result.isEmpty());
     }
 
     @Test
     void should_returnEmptyMap_when_reservationsListIsEmpty() {
-      Map<String, List<Reservation>> result = reservationService.groupReservationsByCountry(List.of());
+      Map<String, List<Reservation>> result =
+          reservationService.groupReservationsByCountry(List.of());
 
       assertTrue(result.isEmpty());
     }
@@ -238,7 +253,8 @@ class ReservationServiceTest {
       var accommodation = Fixtures.accommodation("HotelCo", 100, 2, 3, brazil);
       Reservation reservation = Fixtures.reservation(1L, Instant.now(), accommodation, user);
 
-      Map<String, List<Reservation>> result = reservationService.groupReservationsByCountry(List.of(reservation));
+      Map<String, List<Reservation>> result =
+          reservationService.groupReservationsByCountry(List.of(reservation));
 
       assertEquals(List.of(reservation), result.get("Brazil"));
     }
@@ -258,8 +274,9 @@ class ReservationServiceTest {
       when(userDao.findByUsername(username)).thenReturn(Optional.of(user));
       when(flightDao.findByNumber(flightNumber)).thenReturn(Optional.of(flight));
 
-      Reservation result = reservationService.createReservation(
-          username, flightNumber, future, userDao, flightDao, reservationDao);
+      Reservation result =
+          reservationService.createReservation(
+              username, flightNumber, future, userDao, flightDao, reservationDao);
 
       assertEquals(user, result.getOwner());
       assertEquals(flight, result.getService());
@@ -271,8 +288,16 @@ class ReservationServiceTest {
     void should_throwUserNotFoundException_when_userDoesNotExist() throws Exception {
       when(userDao.findByUsername(username)).thenReturn(Optional.empty());
 
-      assertThrows(UserNotFoundException.class, () -> reservationService.createReservation(
-          username, flightNumber, Instant.now().plusSeconds(60), userDao, flightDao, reservationDao));
+      assertThrows(
+          UserNotFoundException.class,
+          () ->
+              reservationService.createReservation(
+                  username,
+                  flightNumber,
+                  Instant.now().plusSeconds(60),
+                  userDao,
+                  flightDao,
+                  reservationDao));
     }
 
     @Test
@@ -280,8 +305,16 @@ class ReservationServiceTest {
       when(userDao.findByUsername(username)).thenReturn(Optional.of(Fixtures.user(username)));
       when(flightDao.findByNumber(flightNumber)).thenReturn(Optional.empty());
 
-      assertThrows(FlightNotFoundException.class, () -> reservationService.createReservation(
-          username, flightNumber, Instant.now().plusSeconds(60), userDao, flightDao, reservationDao));
+      assertThrows(
+          FlightNotFoundException.class,
+          () ->
+              reservationService.createReservation(
+                  username,
+                  flightNumber,
+                  Instant.now().plusSeconds(60),
+                  userDao,
+                  flightDao,
+                  reservationDao));
     }
 
     @Test
@@ -290,8 +323,11 @@ class ReservationServiceTest {
       when(flightDao.findByNumber(flightNumber))
           .thenReturn(Optional.of(Fixtures.flight(flightNumber, "AeroLine", "AeroLine", 100, 1)));
 
-      assertThrows(InvalidDateRangeException.class, () -> reservationService.createReservation(
-          username, flightNumber, null, userDao, flightDao, reservationDao));
+      assertThrows(
+          InvalidDateRangeException.class,
+          () ->
+              reservationService.createReservation(
+                  username, flightNumber, null, userDao, flightDao, reservationDao));
     }
 
     @Test
@@ -300,8 +336,16 @@ class ReservationServiceTest {
       when(flightDao.findByNumber(flightNumber))
           .thenReturn(Optional.of(Fixtures.flight(flightNumber, "AeroLine", "AeroLine", 100, 1)));
 
-      assertThrows(InvalidDateRangeException.class, () -> reservationService.createReservation(
-          username, flightNumber, Instant.now().minusSeconds(60), userDao, flightDao, reservationDao));
+      assertThrows(
+          InvalidDateRangeException.class,
+          () ->
+              reservationService.createReservation(
+                  username,
+                  flightNumber,
+                  Instant.now().minusSeconds(60),
+                  userDao,
+                  flightDao,
+                  reservationDao));
     }
 
     @Test
@@ -309,10 +353,21 @@ class ReservationServiceTest {
       when(userDao.findByUsername(username)).thenReturn(Optional.of(Fixtures.user(username)));
       when(flightDao.findByNumber(flightNumber))
           .thenReturn(Optional.of(Fixtures.flight(flightNumber, "AeroLine", "AeroLine", 100, 1)));
-      org.mockito.Mockito.doThrow(new DataAccessException("disk full")).when(reservationDao).save(any());
+      org.mockito.Mockito.doThrow(new DataAccessException("disk full"))
+          .when(reservationDao)
+          .save(any());
 
-      DataAccessException thrown = assertThrows(DataAccessException.class, () -> reservationService.createReservation(
-          username, flightNumber, Instant.now().plusSeconds(60), userDao, flightDao, reservationDao));
+      DataAccessException thrown =
+          assertThrows(
+              DataAccessException.class,
+              () ->
+                  reservationService.createReservation(
+                      username,
+                      flightNumber,
+                      Instant.now().plusSeconds(60),
+                      userDao,
+                      flightDao,
+                      reservationDao));
 
       assertTrue(thrown.getMessage().contains(username));
       assertTrue(thrown.getMessage().contains(flightNumber));
@@ -328,7 +383,9 @@ class ReservationServiceTest {
       Flight flight = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
       Reservation newReservation = Fixtures.reservation(1L, Instant.now(), flight, user);
 
-      Reservation result = reservationService.addReservationIfNotDuplicate(List.of(), newReservation, reservationDao);
+      Reservation result =
+          reservationService.addReservationIfNotDuplicate(
+              List.of(), newReservation, reservationDao);
 
       assertEquals(newReservation, result);
       verify(reservationDao).save(newReservation);
@@ -341,8 +398,11 @@ class ReservationServiceTest {
       Reservation existing = Fixtures.reservation(1L, Instant.now(), flight, user);
       Reservation duplicate = Fixtures.reservation(2L, Instant.now(), flight, user);
 
-      assertThrows(DuplicateReservationException.class,
-          () -> reservationService.addReservationIfNotDuplicate(List.of(existing), duplicate, reservationDao));
+      assertThrows(
+          DuplicateReservationException.class,
+          () ->
+              reservationService.addReservationIfNotDuplicate(
+                  List.of(existing), duplicate, reservationDao));
     }
 
     @Test
@@ -352,8 +412,11 @@ class ReservationServiceTest {
       Reservation existing = Fixtures.reservation(1L, Instant.now(), flight, user);
       Reservation duplicate = Fixtures.reservation(2L, Instant.now(), flight, user);
 
-      assertThrows(DuplicateReservationException.class,
-          () -> reservationService.addReservationIfNotDuplicate(List.of(existing), duplicate, reservationDao));
+      assertThrows(
+          DuplicateReservationException.class,
+          () ->
+              reservationService.addReservationIfNotDuplicate(
+                  List.of(existing), duplicate, reservationDao));
 
       verifyNoInteractions(reservationDao);
     }
@@ -386,7 +449,8 @@ class ReservationServiceTest {
       Reservation r2 = Fixtures.reservation(2L, newer, expensive, user);
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(user));
 
-      List<UserSummaryDTO> result = reservationService.getUserReservationSummaries(List.of(r1, r2), userDao);
+      List<UserSummaryDTO> result =
+          reservationService.getUserReservationSummaries(List.of(r1, r2), userDao);
 
       UserSummaryDTO summary = result.get(0);
       assertEquals("fede", summary.username());
@@ -397,7 +461,8 @@ class ReservationServiceTest {
     }
 
     @Test
-    void should_returnSummariesSortedByTotalSpentDescending_when_multipleUsersHaveReservations() throws Exception {
+    void should_returnSummariesSortedByTotalSpentDescending_when_multipleUsersHaveReservations()
+        throws Exception {
       User fede = Fixtures.user("fede");
       User ana = Fixtures.user("ana");
       Flight cheap = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
@@ -407,8 +472,9 @@ class ReservationServiceTest {
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(fede));
       when(userDao.findByUsername("ana")).thenReturn(Optional.of(ana));
 
-      List<UserSummaryDTO> result = reservationService.getUserReservationSummaries(
-          List.of(fedeReservation, anaReservation), userDao);
+      List<UserSummaryDTO> result =
+          reservationService.getUserReservationSummaries(
+              List.of(fedeReservation, anaReservation), userDao);
 
       assertEquals("ana", result.get(0).username());
       assertEquals("fede", result.get(1).username());
@@ -421,7 +487,8 @@ class ReservationServiceTest {
       Reservation reservation = Fixtures.reservation(1L, Instant.now(), flight, ghost);
       when(userDao.findByUsername("ghost")).thenReturn(Optional.empty());
 
-      assertThrows(UserNotFoundException.class,
+      assertThrows(
+          UserNotFoundException.class,
           () -> reservationService.getUserReservationSummaries(List.of(reservation), userDao));
     }
 
@@ -432,7 +499,8 @@ class ReservationServiceTest {
       Reservation reservation = Fixtures.reservation(1L, Instant.now(), flight, user);
       when(userDao.findByUsername("fede")).thenThrow(new DataAccessException("boom"));
 
-      assertThrows(DataAccessException.class,
+      assertThrows(
+          DataAccessException.class,
           () -> reservationService.getUserReservationSummaries(List.of(reservation), userDao));
     }
   }
@@ -447,8 +515,9 @@ class ReservationServiceTest {
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(user));
       when(flightDao.findByNumber("F1")).thenReturn(Optional.of(flight));
 
-      ValidationResultDTO result = reservationService.validateReservationCandidates(
-          List.of(new Pair<>("fede", "F1")), userDao, flightDao);
+      ValidationResultDTO result =
+          reservationService.validateReservationCandidates(
+              List.of(new Pair<>("fede", "F1")), userDao, flightDao);
 
       assertEquals(List.of(new ReservationCandidateDTO(user, flight)), result.validCandidates());
       assertTrue(result.errors().isEmpty());
@@ -460,8 +529,9 @@ class ReservationServiceTest {
       when(userDao.findByUsername("ghost")).thenReturn(Optional.empty());
       when(flightDao.findByNumber("F1")).thenReturn(Optional.of(flight));
 
-      ValidationResultDTO result = reservationService.validateReservationCandidates(
-          List.of(new Pair<>("ghost", "F1")), userDao, flightDao);
+      ValidationResultDTO result =
+          reservationService.validateReservationCandidates(
+              List.of(new Pair<>("ghost", "F1")), userDao, flightDao);
 
       assertTrue(result.validCandidates().isEmpty());
       assertEquals(List.of("User not found: ghost"), result.errors());
@@ -473,8 +543,9 @@ class ReservationServiceTest {
       when(userDao.findByUsername("fede")).thenReturn(Optional.of(user));
       when(flightDao.findByNumber("ghostFlight")).thenReturn(Optional.empty());
 
-      ValidationResultDTO result = reservationService.validateReservationCandidates(
-          List.of(new Pair<>("fede", "ghostFlight")), userDao, flightDao);
+      ValidationResultDTO result =
+          reservationService.validateReservationCandidates(
+              List.of(new Pair<>("fede", "ghostFlight")), userDao, flightDao);
 
       assertTrue(result.validCandidates().isEmpty());
       assertEquals(List.of("Flight not found: ghostFlight"), result.errors());
@@ -485,11 +556,13 @@ class ReservationServiceTest {
       when(userDao.findByUsername("ghost")).thenReturn(Optional.empty());
       when(flightDao.findByNumber("ghostFlight")).thenReturn(Optional.empty());
 
-      ValidationResultDTO result = reservationService.validateReservationCandidates(
-          List.of(new Pair<>("ghost", "ghostFlight")), userDao, flightDao);
+      ValidationResultDTO result =
+          reservationService.validateReservationCandidates(
+              List.of(new Pair<>("ghost", "ghostFlight")), userDao, flightDao);
 
       assertTrue(result.validCandidates().isEmpty());
-      assertEquals(List.of("User not found: ghost", "Flight not found: ghostFlight"), result.errors());
+      assertEquals(
+          List.of("User not found: ghost", "Flight not found: ghostFlight"), result.errors());
     }
 
     @Test
@@ -500,8 +573,9 @@ class ReservationServiceTest {
       when(userDao.findByUsername("ghost")).thenReturn(Optional.empty());
       when(flightDao.findByNumber("F1")).thenReturn(Optional.of(flight));
 
-      ValidationResultDTO result = reservationService.validateReservationCandidates(
-          List.of(new Pair<>("fede", "F1"), new Pair<>("ghost", "F1")), userDao, flightDao);
+      ValidationResultDTO result =
+          reservationService.validateReservationCandidates(
+              List.of(new Pair<>("fede", "F1"), new Pair<>("ghost", "F1")), userDao, flightDao);
 
       assertEquals(1, result.validCandidates().size());
       assertEquals(List.of("User not found: ghost"), result.errors());
@@ -511,8 +585,11 @@ class ReservationServiceTest {
     void should_propagateDataAccessException_when_userDaoFails() throws Exception {
       when(userDao.findByUsername("fede")).thenThrow(new DataAccessException("boom"));
 
-      assertThrows(DataAccessException.class, () -> reservationService.validateReservationCandidates(
-          List.of(new Pair<>("fede", "F1")), userDao, flightDao));
+      assertThrows(
+          DataAccessException.class,
+          () ->
+              reservationService.validateReservationCandidates(
+                  List.of(new Pair<>("fede", "F1")), userDao, flightDao));
     }
   }
 }

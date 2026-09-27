@@ -23,8 +23,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class TouristServiceServiceTest {
 
-  @Mock
-  private FlightDao flightDao;
+  @Mock private FlightDao flightDao;
 
   private TouristServiceService touristServiceService;
 
@@ -41,7 +40,8 @@ class TouristServiceServiceTest {
       Flight flight1 = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
       Flight flight2 = Fixtures.flight("F2", "AeroLine", "AeroLine", 300, 1);
 
-      double average = touristServiceService.getAveragePriceByCompany(List.of(flight1, flight2), "AeroLine");
+      double average =
+          touristServiceService.getAveragePriceByCompany(List.of(flight1, flight2), "AeroLine");
 
       double expected = (flight1.calculatePrice() + flight2.calculatePrice()) / 2;
       assertEquals(expected, average);
@@ -61,7 +61,8 @@ class TouristServiceServiceTest {
       Flight aeroLine = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
       Flight otherCo = Fixtures.flight("F2", "OtherCo", "OtherCo", 900, 1);
 
-      double average = touristServiceService.getAveragePriceByCompany(List.of(aeroLine, otherCo), "AeroLine");
+      double average =
+          touristServiceService.getAveragePriceByCompany(List.of(aeroLine, otherCo), "AeroLine");
 
       assertEquals(aeroLine.calculatePrice(), average);
     }
@@ -70,13 +71,15 @@ class TouristServiceServiceTest {
     void should_throwServiceNotFoundException_when_noServicesMatchCompany() {
       Flight flight = Fixtures.flight("F1", "AeroLine", "AeroLine", 100, 1);
 
-      assertThrows(ServiceNotFoundException.class,
+      assertThrows(
+          ServiceNotFoundException.class,
           () -> touristServiceService.getAveragePriceByCompany(List.of(flight), "UnknownCo"));
     }
 
     @Test
     void should_throwServiceNotFoundException_when_servicesListIsEmpty() {
-      assertThrows(ServiceNotFoundException.class,
+      assertThrows(
+          ServiceNotFoundException.class,
           () -> touristServiceService.getAveragePriceByCompany(List.of(), "AeroLine"));
     }
   }
@@ -91,8 +94,8 @@ class TouristServiceServiceTest {
       when(flightDao.findByNumber("F1")).thenReturn(Optional.of(cheap));
       when(flightDao.findByNumber("F2")).thenReturn(Optional.of(expensive));
 
-      List<Flight> result = touristServiceService.getFlightsSortedByPriceThenAirline(
-          List.of("F2", "F1"), flightDao);
+      List<Flight> result =
+          touristServiceService.getFlightsSortedByPriceThenAirline(List.of("F2", "F1"), flightDao);
 
       assertEquals(List.of(cheap, expensive), result);
     }
@@ -104,15 +107,16 @@ class TouristServiceServiceTest {
       when(flightDao.findByNumber("F1")).thenReturn(Optional.of(zeta));
       when(flightDao.findByNumber("F2")).thenReturn(Optional.of(alpha));
 
-      List<Flight> result = touristServiceService.getFlightsSortedByPriceThenAirline(
-          List.of("F1", "F2"), flightDao);
+      List<Flight> result =
+          touristServiceService.getFlightsSortedByPriceThenAirline(List.of("F1", "F2"), flightDao);
 
       assertEquals(List.of(alpha, zeta), result);
     }
 
     @Test
     void should_returnEmptyList_when_flightNumbersListIsEmpty() throws Exception {
-      List<Flight> result = touristServiceService.getFlightsSortedByPriceThenAirline(List.of(), flightDao);
+      List<Flight> result =
+          touristServiceService.getFlightsSortedByPriceThenAirline(List.of(), flightDao);
 
       assertTrue(result.isEmpty());
     }
@@ -121,8 +125,11 @@ class TouristServiceServiceTest {
     void should_throwFlightNotFoundException_when_flightNumberDoesNotExist() {
       when(flightDao.findByNumber("ghost")).thenReturn(Optional.empty());
 
-      assertThrows(FlightNotFoundException.class,
-          () -> touristServiceService.getFlightsSortedByPriceThenAirline(List.of("ghost"), flightDao));
+      assertThrows(
+          FlightNotFoundException.class,
+          () ->
+              touristServiceService.getFlightsSortedByPriceThenAirline(
+                  List.of("ghost"), flightDao));
     }
   }
 }
