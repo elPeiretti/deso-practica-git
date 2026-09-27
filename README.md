@@ -153,7 +153,9 @@ válidos y los errores acumulados.
 5. Abrir un Pull Request desde el fork hacia la rama `main` de **este** repositorio.
    GitHub completará automáticamente la descripción con la plantilla de
    `.github/PULL_REQUEST_TEMPLATE.md`.
-6. **Marcar con una `x` únicamente los ejercicios implementados:**
+6. Reemplazar `{}` en el título de la descripción (`# Grupo {}`) por el número de
+   grupo correspondiente.
+7. **Marcar con una `x` únicamente los ejercicios implementados:**
 
    ```markdown
    - [x] Ejercicio 1 — Filtrado y ordenamiento por precio
@@ -164,7 +166,7 @@ válidos y los errores acumulados.
    números: el CI utiliza ese texto para determinar a qué ejercicio corresponde
    cada casillero.
 
-7. El workflow de CI (`.github/workflows/maven-tests.yml`) realizará lo siguiente:
+8. El workflow de CI (`.github/workflows/maven-tests.yml`) realizará lo siguiente:
    - Ejecutar toda la batería de tests.
    - Revisar el checklist y exigir que **cada ejercicio marcado pase todos sus
      tests**. Un ejercicio marcado que continúe sin implementarse (o esté mal
@@ -173,7 +175,7 @@ válidos y los errores acumulados.
    - Publicar una tabla con el resultado de cada ejercicio en el resumen de la
      ejecución (pestaña *Actions* → ejecución correspondiente → *Summary*).
 
-8. Si se envían nuevos cambios o se edita el PR para marcar más ejercicios, el CI se
+9. Si se envían nuevos cambios o se edita el PR para marcar más ejercicios, el CI se
    ejecutará nuevamente de forma automática.
 
 ### Importante
