@@ -4,7 +4,7 @@ Proyecto de práctica sobre un sistema de reservas turísticas (vuelos, alojamie
 usuarios). La lógica de negocio se resuelve **en la capa de servicio** (`service`) y,
 en algunos ejercicios, también en la capa de acceso a datos (`repository.dao`).
 
-El dominio (`domain`) y las excepciones ya provistas **no deben modificarse**. Cada
+Los métodos implementados en el dominio (`domain`) y las excepciones ya provistas **no deben modificarse**. Cada
 método de servicio o DAO a implementar ya tiene su firma definida; no debe alterarse,
 ya que de lo contrario los tests no compilarán.
 
@@ -12,7 +12,26 @@ Cada ejercicio se encuentra sin resolver: su método lanza `UnsupportedOperation
 El objetivo es implementar la lógica correspondiente hasta que los tests pasen, sin
 modificar la firma de los métodos ni las clases de dominio o excepciones.
 
----
+
+
+## Organización del grupo
+
+Antes de comenzar, los integrantes deberán acordar la distribución del trabajo
+y configurar un repositorio compartido.
+
+1. **Crear un único fork:** un integrante deberá crear el fork de este repositorio en la cuenta que utilizará el grupo.
+2. **Configurar los colaboradores:** el propietario del fork deberá agregar al resto de los integrantes con los permisos necesarios.
+3. **Distribuir los ejercicios:** cada integrante deberá seleccionar un ejercicio diferente. No se permite que dos integrantes resuelvan el mismo ejercicio.
+4. **Implementar y compartir los cambios:** cada integrante deberá subir su implementación al repositorio del grupo, utilizando el workflow de Git acordado.
+5. **Preparar la entrega:** el grupo deberá abrir un único Pull Request desde el fork compartido hacia la rama `main` de este repositorio.
+
+El Pull Request deberá incluir tantos ejercicios resueltos como integrantes
+tenga el grupo. Por ejemplo, un grupo de cinco integrantes deberá entregar
+cinco ejercicios.
+
+**Requisito obligatorio:** entre los ejercicios seleccionados por el grupo, deberá incluirse al menos uno de los siguientes: 3, 9 o 10.
+
+> Algunos ejercicios pueden requerir modificar clases adicionales a la capa  de servicios, por ejemplo, para implementar o sobrescribir el método `equals()`.
 
 ## Cómo entregar el trabajo (Pull Request)
 
@@ -50,8 +69,7 @@ modificar la firma de los métodos ni las clases de dominio o excepciones.
 
 ### Importante
 
-- No deben modificarse las firmas de los métodos ni las clases en `domain` o
-  `exception`.
+- No deben modificarse las firmas de los métodos ni las clases ya existentes en `domain` o `exception`.
 - No deben modificarse los archivos de test.
 
 
