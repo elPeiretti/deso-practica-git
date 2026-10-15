@@ -3,11 +3,9 @@ package repository.dao;
 import domain.Reservation;
 import exception.DataAccessException;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReservationDaoFileImpl implements ReservationDao {
@@ -51,6 +49,29 @@ public class ReservationDaoFileImpl implements ReservationDao {
   // Ejercicio 3 (Parte A)
   @Override
   public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement findByDateRange");
+    List<Reservation> result = new ArrayList<>();
+
+    if (!file.exists()) {
+      return result;
+    }
+
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        String[] parts = line.split(",");
+        Instant date = Instant.parse(parts[3]);
+
+        if (date.compareTo(from) >= 0 && date.compareTo(to) <= 0) {
+          Reservation reservation = new Reservation();
+          reservation.setId(Long.parseLong(parts[0]));
+          reservation.setDate(date);
+          result.add(reservation);
+        }
+      }
+    } catch (IOException e) {
+      throw new DataAccessException("Error al leer las reservas", e);
+    }
+
+    return result;
   }
 }
