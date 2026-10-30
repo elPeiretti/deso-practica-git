@@ -1,5 +1,6 @@
 package service;
 
+import domain.Location;
 import domain.User;
 import dto.user.UserResponse;
 import exception.DataAccessException;
@@ -27,7 +28,23 @@ public class UserService {
   // Ejercicio 6
   public User getValidatedUser(String username, UserDao userDao)
       throws UserNotFoundException, IncompleteUserException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 6: implement getValidatedUser");
+    User user = userDao.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Usuario no encontrado: " + username));
+
+    Location address =user.getAddress();
+    if (address == null){
+      throw new IncompleteUserException(
+              "El usuario '" + username + "' no tiene dirección");
+    }
+    if(address.getCity()== null || address.getCity().trim().isEmpty()){
+      throw new IncompleteUserException(
+              "El usuario '" + username + "' no tiene city");
+    }
+    if(address.getCountry()== null || address.getCountry().trim().isEmpty()){
+      throw new IncompleteUserException(
+              "El usuario '" + username + "' no tiene country");
+    }
+
+    return user;
   }
 
   // Ejercicio 9
