@@ -1,8 +1,6 @@
 package service;
 
-import domain.Reservation;
-import domain.TouristService;
-import domain.User;
+import domain.*;
 import dto.reservation.CreateReservationRequest;
 import dto.reservation.ReservationResponse;
 import dto.reservation.ValidationResultDTO;
@@ -19,8 +17,12 @@ import repository.dao.UserDao;
 import util.Pair;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public class ReservationService {
   private final ReservationDao reservationDao;
@@ -74,14 +76,52 @@ public class ReservationService {
 
   // Ejercicio 3
   public List<Reservation> getTopNMostExpensive(
-      ReservationDao reservationDao, Instant from, Instant to, int n)
-      throws InvalidDateRangeException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement getTopNMostExpensive");
+          ReservationDao reservationDao, Instant from, Instant to, int n)
+          throws InvalidDateRangeException, DataAccessException {
+    if (from == null || to == null || from.isAfter(to)) {
+      throw new InvalidDateRangeException("Invalid date range: from=" + from + ", to=" + to);
+    }
+    if (n <= 0) {
+      return new ArrayList<>();
+    }
+
+    List<Reservation> reservations = new ArrayList<>(reservationDao.findByDateRange(from, to));
+    reservations.sort(Comparator.comparing(Reservation::calculatePrice).reversed());
+
+    if (reservations.size() <= n) {
+      return reservations;
+    }
+    return new ArrayList<>(reservations.subList(0, n));
   }
+
 
   // Ejercicio 5
   public Map<String, List<Reservation>> groupReservationsByCountry(List<Reservation> reservations) {
-    throw new UnsupportedOperationException("Ejercicio 5: implement groupReservationsByCountry");
+    Map<String, List<Reservation>> mapa = reservations.stream()
+            .filter(r -> {
+              TouristService servicio = r.getService();
+              if (servicio instanceof Accommodation a) {
+                return (a.getLocation() != null && a.getLocation().getCountry() != null);
+              }
+              if (servicio instanceof Flight f) {
+                return (f.getArrivalInfo() != null && f.getArrivalInfo().getCountry() != null);
+              }
+              return false;
+            }).collect(Collectors.groupingBy(r -> {
+              TouristService servicio = r.getService();
+
+              if (servicio instanceof Accommodation a) {
+                return a.getLocation().getCountry();
+              }
+
+              else {
+                return ((Flight) servicio).getArrivalInfo().getCountry();
+              }
+            }));
+    mapa.values().forEach(lista ->
+            lista.sort(Comparator.comparing(Reservation::getDate))
+    );
+    return mapa;
   }
 
   // Ejercicio 7

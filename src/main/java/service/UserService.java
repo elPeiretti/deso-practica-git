@@ -27,7 +27,16 @@ public class UserService {
   // Ejercicio 6
   public User getValidatedUser(String username, UserDao userDao)
       throws UserNotFoundException, IncompleteUserException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 6: implement getValidatedUser");
+
+    User user = userDao.findByUsername(username).orElseThrow(() -> new UserNotFoundException("Usuario: " + username + " no encontrado"));
+    if (user.getAddress() == null ||
+            user.getAddress().getCity() == null ||
+            user.getAddress().getCountry() == null ||
+            user.getAddress().getCity().toString().isBlank() ||
+            user.getAddress().getCountry().toString().isBlank()){
+      throw new IncompleteUserException("El usuario: " + username + " se encuentra incompleto");
+    }
+    return user;
   }
 
   // Ejercicio 9

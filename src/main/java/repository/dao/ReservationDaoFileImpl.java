@@ -9,6 +9,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
+import domain.User;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.UUID;
 
 public class ReservationDaoFileImpl implements ReservationDao {
   private static ReservationDaoFileImpl instance;
@@ -51,6 +57,38 @@ public class ReservationDaoFileImpl implements ReservationDao {
   // Ejercicio 3 (Parte A)
   @Override
   public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement findByDateRange");
-  }
-}
+    List<Reservation> result = new ArrayList<>();
+    if (!file.exists()) {
+      return result;
+    }
+
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        if (line.isBlank()) {
+          continue;
+        }
+        String[] parts = line.split(",");
+        if (parts.length < 4) {
+          continue;
+        }
+
+        Instant date = Instant.parse(parts[3].trim());
+        if (!date.isBefore(from) && !date.isAfter(to)) {
+          User owner = new User();
+          owner.setId(UUID.fromString(parts[2].trim()));
+
+          Reservation reservation = new Reservation();
+          reservation.setId(Long.parseLong(parts[0].trim()));
+          reservation.setDate(date);
+          reservation.setOwner(owner);
+          result.add(reservation);
+        }
+      }
+    } catch (IOException e) {
+      throw new DataAccessException("error al leer las reservas", e);
+    } catch (IllegalArgumentException | DateTimeParseException e) {
+      throw new DataAccessException("El archivo de reservas tiene una línea inválida", e);
+    }
+    return result;
+  }}
