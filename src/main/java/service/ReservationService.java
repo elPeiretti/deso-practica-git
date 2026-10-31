@@ -17,8 +17,10 @@ import repository.dao.ReservationDao;
 import repository.dao.ReservationExportDao;
 import repository.dao.UserDao;
 import util.Pair;
+import java.util.Comparator;
 
 import java.time.Instant;
+
 import java.util.List;
 import java.util.Map;
 
@@ -69,14 +71,32 @@ public class ReservationService {
   public List<Reservation> getReservationsByUser(
       List<Reservation> reservations, String username, UserDao userDao)
       throws UserNotFoundException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
+      if (userDao.findByUsername(username).isEmpty()){
+         throw new UserNotFoundException("No se encontro el usuario" + username);
+        }
+      List<Reservation> reservas = reservations.stream().filter(r -> r.getOwner().getUsername().equals(username)).sorted( (r1,r2) -> Double.compare(r2.calculatePrice(), r1.calculatePrice())).toList();
+      return reservas;      
+    //throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
   }
 
   // Ejercicio 3
   public List<Reservation> getTopNMostExpensive(
-      ReservationDao reservationDao, Instant from, Instant to, int n)
-      throws InvalidDateRangeException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement getTopNMostExpensive");
+          ReservationDao reservationDao, Instant from, Instant to, int n)
+          throws InvalidDateRangeException, DataAccessException {
+    if (from == null || to == null) {
+      throw new InvalidDateRangeException("Las fechas 'from' y 'to' son obligatorias");
+    }
+    if (from.isAfter(to)) {
+      throw new InvalidDateRangeException("'from' no puede ser posterior a 'to'");
+    }
+    if (n <= 0) {
+      return List.of();
+    }
+
+    return reservationDao.findByDateRange(from, to).stream()
+            .sorted(Comparator.comparingDouble(Reservation::calculatePrice).reversed())
+            .limit(n)
+            .toList();
   }
 
   // Ejercicio 5
