@@ -19,8 +19,11 @@ import repository.dao.UserDao;
 import util.Pair;
 
 import java.time.Instant;
+
 import java.util.List;
 import java.util.Map;
+import java.util.Stream;
+import java.util.Comparator;
 
 public class ReservationService {
   private final ReservationDao reservationDao;
@@ -69,7 +72,12 @@ public class ReservationService {
   public List<Reservation> getReservationsByUser(
       List<Reservation> reservations, String username, UserDao userDao)
       throws UserNotFoundException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
+      if (userDao.findByUsername(username).isEmpty()){
+         throw new UserNotFoundException();
+        }
+      Stream<Reservation> reservas = reservations.stream().filter(r -> r.getOwner().equals(username)).sorted( (r1,r2) -> Integer.compare(r2.calculatePrice(), r1.calculatePrice())).toList();
+      return reservas;      
+    //throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
   }
 
   // Ejercicio 3
