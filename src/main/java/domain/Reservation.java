@@ -6,6 +6,9 @@ import lombok.Setter;
 import java.time.Instant;
 
 @Getter
+  public User getOwner(){
+    return this.owner;
+  }
 @Setter
 public class Reservation implements Identifiable {
   private Long id;
@@ -21,7 +24,7 @@ public class Reservation implements Identifiable {
   public String getId() {
     return id.toString();
   }
-
+    
   public static class Builder {
     private Long id;
     private Instant date;
