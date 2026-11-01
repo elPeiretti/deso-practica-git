@@ -3,6 +3,14 @@ package repository.dao;
 import domain.Reservation;
 import exception.DataAccessException;
 
+//Agregado para ejercicio 3
+import domain.TouristService;
+import domain.User;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.UUID;
+// ------------------
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
