@@ -13,7 +13,11 @@ public class TouristServiceService {
   // Ejercicio 2
   public double getAveragePriceByCompany(List<TouristService> services, String company)
       throws ServiceNotFoundException {
-    throw new UnsupportedOperationException("Ejercicio 2: implement getAveragePriceByCompany");
+    return services.stream()
+        .filter(service -> service.getCompany().equalsIgnoreCase(company))
+        .mapToDouble(TouristService::calculatePrice)
+        .average()
+        .orElseThrow(() -> new ServiceNotFoundException(company));
   }
 
   // Ejercicio 4

@@ -32,6 +32,8 @@ public class ReservationDaoFileImpl implements ReservationDao {
     return instance;
   }
 
+  private final List<Reservation> reservations = new java.util.ArrayList<>();
+
   @Override
   public void save(Reservation reservation) throws DataAccessException {
     try (BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))) {
@@ -43,6 +45,7 @@ public class ReservationDaoFileImpl implements ReservationDao {
               reservation.getOwner().getId(),
               reservation.getDate());
       bw.write(line);
+      reservations.add(reservation);
     } catch (IOException e) {
       throw new DataAccessException("Error al guardar la reserva", e);
     }
@@ -51,6 +54,8 @@ public class ReservationDaoFileImpl implements ReservationDao {
   // Ejercicio 3 (Parte A)
   @Override
   public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement findByDateRange");
+    return reservations.stream()
+        .filter(r -> r.getDate() != null && !r.getDate().isBefore(from) && !r.getDate().isAfter(to))
+        .toList();
   }
 }
