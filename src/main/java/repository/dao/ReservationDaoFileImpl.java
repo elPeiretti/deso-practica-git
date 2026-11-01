@@ -59,9 +59,6 @@ public class ReservationDaoFileImpl implements ReservationDao {
   // Ejercicio 3 (Parte A)
   @Override
   public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
-    // Ejercicio 3 (Parte A)
-@Override
-public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
     List<Reservation> result = new ArrayList<>();
     if (!file.exists()) {
         return result;
@@ -88,18 +85,17 @@ public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAc
         throw new DataAccessException("Error al leer las reservas", e);
     }
     return result;
-}
+  }
 
-// El archivo solo guarda el ID del servicio, así que se reconstruye uno mínimo.
-private static class StoredService extends TouristService {
-    StoredService(UUID id) {
-        super(id, null);
-    }
+  // El archivo solo guarda el ID del servicio, así que se reconstruye uno mínimo.
+  private static class StoredService extends TouristService {
+      StoredService(UUID id) {
+          super(id, null);
+      }
 
-    @Override
-    public double calculatePrice() {
-        return 0;
-    }
-}
+      @Override
+      public double calculatePrice() {
+          return 0;
+      }
   }
 }
