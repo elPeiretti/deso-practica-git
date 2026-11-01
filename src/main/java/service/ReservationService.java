@@ -19,8 +19,7 @@ import repository.dao.UserDao;
 import util.Pair;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ReservationService {
   private final ReservationDao reservationDao;
@@ -36,23 +35,20 @@ public class ReservationService {
   public ReservationResponse createReservation(CreateReservationRequest request)
       throws DataAccessException, UserNotFoundException, FlightNotFoundException {
     // 1. Resolver entidades de dominio desde los datos del DTO
-    User user =
-        userDao
-            .findByUsername(request.username())
-            .orElseThrow(() -> new UserNotFoundException(request.username()));
-    TouristService service =
-        flightDao
-            .findByNumber(request.flightNumber())
-            .orElseThrow(() -> new FlightNotFoundException(request.flightNumber()));
+    User user = userDao
+        .findByUsername(request.username())
+        .orElseThrow(() -> new UserNotFoundException(request.username()));
+    TouristService service = flightDao
+        .findByNumber(request.flightNumber())
+        .orElseThrow(() -> new FlightNotFoundException(request.flightNumber()));
 
     // 2. Construir la reserva (lógica de dominio)
-    Reservation reservation =
-        new Reservation.Builder()
-            .id((long) (Math.random() * 1000))
-            .owner(user)
-            .service(service)
-            .date(request.date())
-            .build();
+    Reservation reservation = new Reservation.Builder()
+        .id((long) (Math.random() * 1000))
+        .owner(user)
+        .service(service)
+        .date(request.date())
+        .build();
 
     reservationDao.save(reservation);
 
@@ -66,18 +62,35 @@ public class ReservationService {
   }
 
   // Ejercicio 1
-  public List<Reservation> getReservationsByUser(
-      List<Reservation> reservations, String username, UserDao userDao)
-      throws UserNotFoundException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
+  public List<Reservation> getReservationsByUser(List<Reservation> reservations, String username, UserDao userDao) throws UserNotFoundException, DataAccessException {
+
+    Optional<User> usuarioEncontradoDao = userDao.findByUsername(username);
+
+    if (usuarioEncontradoDao.isEmpty()) {
+      throw new UserNotFoundException(username);
+    }
+   return reservations.stream()
+           .filter(reservation -> reservation.getOwner().getUsername().equals(username))
+           .sorted(Comparator.comparing(Reservation::calculatePrice).reversed())
+           .toList();
   }
 
   // Ejercicio 3
-  public List<Reservation> getTopNMostExpensive(
-      ReservationDao reservationDao, Instant from, Instant to, int n)
-      throws InvalidDateRangeException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement getTopNMostExpensive");
-  }
+  public List<Reservation> getTopNMostExpensive(ReservationDao reservationDao, Instant from, Instant to, int n) throws InvalidDateRangeException, DataAccessException
+    {
+          if( ( from == null) || (to == null) || (from.isAfter(to)))
+                throw new InvalidDateRangeException("campo/s invalido/s");
+          if(n <= 0)
+              return (new ArrayList<>());
+
+      ArrayList<Reservation> reservas = new ArrayList<>(reservationDao.findByDateRange(from, to));
+
+      reservas.sort(Comparator.comparingDouble(Reservation::calculatePrice).reversed());
+
+      int limite = Math.min(n, reservas.size());
+
+      return new ArrayList<>(reservas.subList(0, limite));
+    }
 
   // Ejercicio 5
   public Map<String, List<Reservation>> groupReservationsByCountry(List<Reservation> reservations) {
@@ -93,19 +106,32 @@ public class ReservationService {
       FlightDao flightDao,
       ReservationDao reservationDao)
       throws UserNotFoundException,
-          FlightNotFoundException,
-          InvalidDateRangeException,
-          DataAccessException {
+      FlightNotFoundException,
+      InvalidDateRangeException,
+      DataAccessException {
     throw new UnsupportedOperationException("Ejercicio 7: implement createReservation");
   }
 
   // Ejercicio 8
-  public Reservation addReservationIfNotDuplicate(
-      List<Reservation> existingReservations,
-      Reservation newReservation,
+  public Reservation addReservationIfNotDuplicate(List<Reservation> existing, Reservation newReservation,
       ReservationDao reservationDao)
       throws DuplicateReservationException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 8: implement addReservationIfNotDuplicate");
+
+    // Recorre la lista para ver si existe una reserva igual
+    for (Reservation r : existing) {
+      if (r.getOwner().getId().equals(newReservation.getOwner().getId()) &&
+          r.getService().getId().equals(newReservation.getService().getId())) {
+
+        // si coincide salta directamente aca
+        throw new DuplicateReservationException(newReservation.getOwner().getId(), newReservation.getService().getId());
+
+      }
+    }
+
+    // Persistimos si el bucle terminó sin lanzar excepciones
+    reservationDao.save(newReservation);
+
+    return newReservation;
   }
 
   // Ejercicio 10
