@@ -166,10 +166,10 @@ public class ReservationService {
   }
 
   // Ejercicio 10
-  public void exportReservationsToCsv(
-      List<Reservation> reservations, ReservationExportDao exportDao) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 10: implement exportReservationsToCsv");
-  }
+public void exportReservationsToCsv(
+    List<Reservation> reservations, ReservationExportDao exportDao) throws DataAccessException {
+    exportDao.exportAll(reservations);
+}
 
   // Ejercicio 11
   public List<UserSummaryDTO> getUserReservationSummaries(
