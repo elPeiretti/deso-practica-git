@@ -10,7 +10,7 @@ suman en contra, aunque sus tests continúen fallando.
 - [ ] Ejercicio 2 — Agrupamiento y promedio por compañía
 - [ ] Ejercicio 3 — Top N reservas más caras en un rango de fechas
 - [ ] Ejercicio 4 — Ordenamiento compuesto de vuelos con enriquecimiento desde DAO
-- [ ] Ejercicio 5 — Agrupamiento de reservas por país del servicio
+- [x] Ejercicio 5 — Agrupamiento de reservas por país del servicio
 - [ ] Ejercicio 6 — Búsqueda de usuario con validación de perfil completo
 - [ ] Ejercicio 7 — Creación de reserva con validación completa y manejo de fallo en persistencia
 - [ ] Ejercicio 8 — Detección de duplicados antes de persistir
