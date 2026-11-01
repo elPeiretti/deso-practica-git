@@ -1,5 +1,8 @@
 package service;
 
+import domain.Accommodation;
+import domain.Flight;
+import domain.Location;
 import domain.Reservation;
 import domain.TouristService;
 import domain.User;
@@ -23,8 +26,11 @@ import java.util.Comparator;
 //-----------
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ReservationService {
   private final ReservationDao reservationDao;
@@ -97,9 +103,42 @@ public class ReservationService {
         .toList();
   }
 
-  // Ejercicio 5
+// Ejercicio 5
   public Map<String, List<Reservation>> groupReservationsByCountry(List<Reservation> reservations) {
-    throw new UnsupportedOperationException("Ejercicio 5: implement groupReservationsByCountry");
+    if (reservations == null) {
+      return Collections.emptyMap();
+    }
+
+    return reservations.stream()
+        
+        .filter(r -> getCountryFromReservation(r) != null)
+     
+        .sorted(Comparator.comparing(Reservation::getDate, Comparator.nullsLast(Comparator.naturalOrder())))
+       
+        .collect(Collectors.groupingBy(this::getCountryFromReservation));
+  }
+
+ 
+  private String getCountryFromReservation(Reservation reservation) {
+    if (reservation == null || reservation.getService() == null) {
+      return null;
+    }
+
+    TouristService service = reservation.getService();
+    Location location = null;
+
+   
+    if (service instanceof Accommodation acc) {
+      location = acc.getLocation();
+    } else if (service instanceof Flight flight) {
+      location = flight.getArrivalInfo();
+    }
+
+    if (location != null && location.getCountry() != null && !location.getCountry().isBlank()) {
+      return location.getCountry();
+    }
+
+    return null;
   }
 
   // Ejercicio 7
