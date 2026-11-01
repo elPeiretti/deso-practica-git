@@ -59,6 +59,47 @@ public class ReservationDaoFileImpl implements ReservationDao {
   // Ejercicio 3 (Parte A)
   @Override
   public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement findByDateRange");
+    // Ejercicio 3 (Parte A)
+@Override
+public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
+    List<Reservation> result = new ArrayList<>();
+    if (!file.exists()) {
+        return result;
+    }
+    try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+        String line;
+        while ((line = br.readLine()) != null) {
+            if (line.isBlank()) continue;
+            String[] parts = line.split(",");
+            Instant date = Instant.parse(parts[3]);
+            if (date.isBefore(from) || date.isAfter(to)) continue;
+
+            User owner = User.builder().id(UUID.fromString(parts[2])).build();
+            TouristService service = new StoredService(UUID.fromString(parts[1]));
+            result.add(
+                new Reservation.Builder()
+                    .id(Long.parseLong(parts[0]))
+                    .date(date)
+                    .service(service)
+                    .owner(owner)
+                    .build());
+        }
+    } catch (IOException e) {
+        throw new DataAccessException("Error al leer las reservas", e);
+    }
+    return result;
+}
+
+// El archivo solo guarda el ID del servicio, así que se reconstruye uno mínimo.
+private static class StoredService extends TouristService {
+    StoredService(UUID id) {
+        super(id, null);
+    }
+
+    @Override
+    public double calculatePrice() {
+        return 0;
+    }
+}
   }
 }
