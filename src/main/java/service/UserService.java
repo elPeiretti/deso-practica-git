@@ -1,5 +1,6 @@
 package service;
 
+import domain.Location;
 import domain.User;
 import dto.user.UserResponse;
 import exception.DataAccessException;
@@ -27,7 +28,19 @@ public class UserService {
   // Ejercicio 6
   public User getValidatedUser(String username, UserDao userDao)
       throws UserNotFoundException, IncompleteUserException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 6: implement getValidatedUser");
+    User user = userDao.findByUsername(username)
+            .orElseThrow(() -> new UserNotFoundException(username));
+
+    Location address = user.getAddress();
+
+    if (address == null ||
+            address.getCountry() == null || address.getCountry().trim().isEmpty() ||
+            address.getCity() == null || address.getCity().trim().isEmpty()) {
+
+      throw new IncompleteUserException("El perfil del usuario está incompleto");
+    }
+
+    return user;
   }
 
   // Ejercicio 9

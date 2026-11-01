@@ -13,8 +13,25 @@ public class TouristServiceService {
   // Ejercicio 2
   public double getAveragePriceByCompany(List<TouristService> services, String company)
       throws ServiceNotFoundException {
-    throw new UnsupportedOperationException("Ejercicio 2: implement getAveragePriceByCompany");
-  }
+      
+        //EJERCICIO 2:
+      
+        double total = 0;
+        int count = 0;
+
+        for (TouristService service : services) {
+            if (service.getCompany().equalsIgnoreCase(company)) {
+                total += service.calculatePrice();
+                count++;
+            }
+        }
+
+        if (count == 0) {
+            throw new ServiceNotFoundException("No se encontraron servicios para la compañía");
+        }
+
+        return total / count;
+    }
 
   // Ejercicio 4
   public List<Flight> getFlightsSortedByPriceThenAirline(
