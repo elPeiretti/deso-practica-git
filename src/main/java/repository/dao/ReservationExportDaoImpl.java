@@ -25,7 +25,7 @@ public class ReservationExportDaoImpl implements ReservationExportDao {
  @Override
 public void exportAll(List<Reservation> reservations) throws DataAccessException {
 
-    try (PrintWriter writer = new PrintWriter(new FileWriter("reservas.csv"))) {
+    try (PrintWriter writer = new PrintWriter(new FileWriter(this.file))) {
         
         writer.println("reservationId,date,ownerUsername,serviceCompany,calculatedPrice");
         
