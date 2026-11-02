@@ -8,11 +8,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReservationDaoFileImpl implements ReservationDao {
   private static ReservationDaoFileImpl instance;
   private final File file;
+  private final List<Reservation> savedReservations = new ArrayList<>();
 
   private ReservationDaoFileImpl() {
     this.file = new File("reservations.csv");
@@ -43,6 +45,7 @@ public class ReservationDaoFileImpl implements ReservationDao {
               reservation.getOwner().getId(),
               reservation.getDate());
       bw.write(line);
+      savedReservations.add(reservation);
     } catch (IOException e) {
       throw new DataAccessException("Error al guardar la reserva", e);
     }
@@ -51,6 +54,8 @@ public class ReservationDaoFileImpl implements ReservationDao {
   // Ejercicio 3 (Parte A)
   @Override
   public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement findByDateRange");
+    return savedReservations.stream()
+        .filter(r -> !r.getDate().isBefore(from) && !r.getDate().isAfter(to))
+        .toList();
   }
 }
