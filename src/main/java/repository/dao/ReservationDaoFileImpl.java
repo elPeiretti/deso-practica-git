@@ -7,7 +7,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReservationDaoFileImpl implements ReservationDao {
@@ -51,6 +54,27 @@ public class ReservationDaoFileImpl implements ReservationDao {
   // Ejercicio 3 (Parte A)
   @Override
   public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement findByDateRange");
+    
+    List<Reservation> result = new ArrayList<>();
+    try {
+      for (String line : Files.readAllLines(file.toPath())) {
+        String[] p = line.split(",");
+        if (p.length < 4) continue;
+        Instant date = Instant.parse(p[3].trim());
+        if (!date.isBefore(from) && !date.isAfter(to)) {
+          Reservation r = new Reservation();
+          r.setId(Long.parseLong(p[0].trim()));
+          r.setDate(date);
+          result.add(r);
+        }
+      }
+    } catch (NoSuchFileException e) {
+      return result;                       // file doesn't exist -> empty list
+    } catch (IOException e) {
+      throw new DataAccessException("Error al leer reservas", e);
+    }
+    return result;
+
+
   }
 }
