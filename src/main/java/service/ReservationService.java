@@ -1,5 +1,6 @@
 package service;
 
+import domain.Flight;
 import domain.Reservation;
 import domain.TouristService;
 import domain.User;
@@ -21,6 +22,9 @@ import util.Pair;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ReservationService {
   private final ReservationDao reservationDao;
@@ -69,19 +73,66 @@ public class ReservationService {
   public List<Reservation> getReservationsByUser(
       List<Reservation> reservations, String username, UserDao userDao)
       throws UserNotFoundException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
+
+   User user = userDao.findByUsername(username).orElseThrow(() -> new UserNotFoundException("No se encontro un usuario con el nombre 'username'"));
+
+    return reservations.stream()
+            .filter(r -> r.getOwner().getUsername().equals(username))
+            .sorted(Comparator.comparingDouble(Reservation::calculatePrice).reversed())
+            .collect(Collectors.toList());
+
   }
 
   // Ejercicio 3
   public List<Reservation> getTopNMostExpensive(
       ReservationDao reservationDao, Instant from, Instant to, int n)
       throws InvalidDateRangeException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement getTopNMostExpensive");
+        if(n <= 0){
+          return List.of();
+        }
+        if(from == null || to == null || from.isAfter(to)){
+          throw new InvalidDateRangeException("Rango de fechas inválido: 'from' debe ser anterior a 'to'");
+        }
+
+        return reservationDao.findByDateRange(from, to).stream()
+                .sorted(Comparator.comparingDouble(Reservation::calculatePrice).reversed())
+                .limit(n)
+                .collect(Collectors.toList());
+        
   }
 
-  // Ejercicio 5
+// Ejercicio 5
   public Map<String, List<Reservation>> groupReservationsByCountry(List<Reservation> reservations) {
-    throw new UnsupportedOperationException("Ejercicio 5: implement groupReservationsByCountry");
+    return reservations.stream()
+        .filter(r -> r.getService() != null)
+        .map(r -> {
+            String country = null;
+            TouristService service = r.getService();
+            
+            // utilizamos instanceof con pattern matching para Flight
+            if (service instanceof domain.Flight flight && flight.getArrivalInfo() != null) {
+                country = flight.getArrivalInfo().getCountry(); 
+            } 
+            // o para Accommodation 
+            else if (service instanceof domain.Accommodation acc && acc.getLocation() != null) {
+                country = acc.getLocation().getCountry();
+            }
+            
+            return new Object[] { r, country };
+        })
+        .filter(arr -> arr[1] != null) 
+        // ignoramos las reservas sin pais/ubicacion asignada
+        .collect(Collectors.groupingBy(
+            arr -> (String) arr[1],
+            Collectors.collectingAndThen(
+                Collectors.mapping(arr -> (Reservation) arr[0], Collectors.toList()),
+                list -> {
+                    // Ordenamos las reservas de cada grupo por fecha asc
+                    list.sort(Comparator.comparing(Reservation::getDate));
+                    return list;
+                }
+            )
+        ));
   }
 
   // Ejercicio 7
@@ -96,7 +147,26 @@ public class ReservationService {
           FlightNotFoundException,
           InvalidDateRangeException,
           DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 7: implement createReservation");
+      User user = userDao.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+      Flight flight = flightDao.findByNumber(flightNumber).orElseThrow(() -> new FlightNotFoundException(flightNumber));
+      if(date == null || date.isBefore(Instant.now())){
+          throw new InvalidDateRangeException("La fecha de la reserva no puede ser nula ni anterior a la fecha actual");
+      }
+      Reservation reservation = new Reservation.Builder()
+              .owner(user)
+              .service(flight)
+              .date(date)
+              .build();
+      try{
+          reservationDao.save(reservation);
+      }
+      catch (DataAccessException e) {
+          throw new DataAccessException("Error al guardar la reserva del usuario " + username + " para el vuelo " + flightNumber, e);
+      }
+
+      return reservation;
+
+
   }
 
   // Ejercicio 8
@@ -105,7 +175,23 @@ public class ReservationService {
       Reservation newReservation,
       ReservationDao reservationDao)
       throws DuplicateReservationException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 8: implement addReservationIfNotDuplicate");
+
+      boolean estaDuplicada = false;
+
+      for(Reservation er : existingReservations){
+            if(er.getOwner().getId().equals(newReservation.getOwner().getId()) &&
+                    er.getService().getId().equals(newReservation.getService().getId())){
+                estaDuplicada = true;
+            }
+      }
+
+      if(estaDuplicada){
+          throw new DuplicateReservationException(newReservation.getOwner().getId(), newReservation.getService().getId());
+      }
+
+      reservationDao.save(newReservation);
+
+      return newReservation;
   }
 
   // Ejercicio 10
