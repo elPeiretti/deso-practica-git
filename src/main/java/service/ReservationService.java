@@ -1,8 +1,6 @@
 package service;
 
-import domain.Reservation;
-import domain.TouristService;
-import domain.User;
+import domain.*;
 import dto.reservation.CreateReservationRequest;
 import dto.reservation.ReservationResponse;
 import dto.reservation.ValidationResultDTO;
@@ -17,10 +15,13 @@ import repository.dao.ReservationDao;
 import repository.dao.ReservationExportDao;
 import repository.dao.UserDao;
 import util.Pair;
-
+import java.util.Objects;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 public class ReservationService {
   private final ReservationDao reservationDao;
@@ -67,21 +68,58 @@ public class ReservationService {
 
   // Ejercicio 1
   public List<Reservation> getReservationsByUser(
-      List<Reservation> reservations, String username, UserDao userDao)
-      throws UserNotFoundException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
+          List<Reservation> reservations, String username, UserDao userDao)
+          throws UserNotFoundException, DataAccessException {
+    userDao.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+    if (reservations == null) {
+      return List.of();
+    }
+    return reservations.stream()
+            .filter(r -> r.getOwner() != null && username.equals(r.getOwner().getUsername()))
+            .sorted(Comparator.comparingDouble(Reservation::calculatePrice).reversed())
+            .toList();
   }
 
   // Ejercicio 3
   public List<Reservation> getTopNMostExpensive(
-      ReservationDao reservationDao, Instant from, Instant to, int n)
-      throws InvalidDateRangeException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement getTopNMostExpensive");
+          ReservationDao reservationDao, Instant from, Instant to, int n)
+          throws InvalidDateRangeException, DataAccessException {
+
+    if (from == null || to == null || from.isAfter(to)) {
+      throw new InvalidDateRangeException("Rango de fechas inválido o nulo");
+    }
+
+    if (n <= 0) {
+      return java.util.Collections.emptyList();
+    }
+
+    return reservationDao.findByDateRange(from, to).stream()
+            .sorted(java.util.Comparator.comparing(Reservation::calculatePrice).reversed())
+            .limit(n)
+            .collect(java.util.stream.Collectors.toList());
   }
 
   // Ejercicio 5
+  private String ubicacionDe(Reservation reservation){
+    TouristService service = reservation.getService();
+    Location loc = null;
+    if(service instanceof Accommodation a){
+      loc = a.getLocation();
+    } else if (service instanceof Flight f) {
+      loc = f.getArrivalInfo();
+    }
+    if(loc == null){
+      return null;
+    }
+    return loc.getCountry();
+  }
+
   public Map<String, List<Reservation>> groupReservationsByCountry(List<Reservation> reservations) {
-    throw new UnsupportedOperationException("Ejercicio 5: implement groupReservationsByCountry");
+    Map<String, List<Reservation>> viaje = reservations.stream()
+            .filter(a -> ubicacionDe(a) != null)
+            .sorted(Comparator.comparing(Reservation::getDate))
+            .collect(Collectors.groupingBy(this::ubicacionDe));
+    return viaje;
   }
 
   // Ejercicio 7
@@ -105,7 +143,19 @@ public class ReservationService {
       Reservation newReservation,
       ReservationDao reservationDao)
       throws DuplicateReservationException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 8: implement addReservationIfNotDuplicate");
+
+    boolean duplicado = existingReservations.stream().anyMatch(
+            res -> Objects.equals(res.getOwner().getId(), newReservation.getOwner().getId())
+                              && Objects.equals(
+                                      res.getService().getId(), newReservation.getService().getId()
+            ));//El booleano guarda el resultado de comparar la nueva reserva con alguna qu ya exista con el mismo owner e id de servicio
+
+    if(duplicado) {throw new DuplicateReservationException(newReservation.getOwner().getId(), newReservation.getService().getId());}
+
+    reservationDao.save(newReservation);
+    return newReservation;
+
+   // throw new UnsupportedOperationException("Ejercicio 8: implement addReservationIfNotDuplicate");
   }
 
   // Ejercicio 10
