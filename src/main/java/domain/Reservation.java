@@ -1,5 +1,6 @@
 package domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,8 +8,11 @@ import java.time.Instant;
 
 @Getter
 @Setter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Reservation implements Identifiable {
+  @EqualsAndHashCode.Include
   private Long id;
+
   private Instant date;
   private TouristService service;
   private User owner;

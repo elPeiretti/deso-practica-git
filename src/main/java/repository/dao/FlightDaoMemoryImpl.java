@@ -5,6 +5,7 @@ import domain.Flight;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class FlightDaoMemoryImpl implements FlightDao {
   private static FlightDaoMemoryImpl instance;
@@ -30,5 +31,15 @@ public class FlightDaoMemoryImpl implements FlightDao {
   @Override
   public Optional<Flight> findByNumber(String number) {
     return Optional.ofNullable(flights.get(number));
+  }
+
+  @Override
+  public Optional<Flight> findById(UUID id) {
+    // Recorre todos los vuelos en memoria
+    return flights.values().stream()
+            // Llama a getId() (el de TouristService) y lo compara con el del CSV
+            .filter(flight ->
+                flight.getId().equals(id)).findFirst();
+
   }
 }
