@@ -1,3 +1,5 @@
+![banner de github](img/Banner-3.jpg)
+
 # Desarrollo de Software - Ejercicios integradores
 
 Proyecto de práctica sobre un sistema de reservas turísticas (vuelos, alojamientos,
@@ -12,130 +14,37 @@ Cada ejercicio se encuentra sin resolver: su método lanza `UnsupportedOperation
 El objetivo es implementar la lógica correspondiente hasta que los tests pasen, sin
 modificar la firma de los métodos ni las clases de dominio o excepciones.
 
+<img src="img/concepto-decorativo-codigo-binario-banner-digital-programacion-codificacion_1055-24774.avif" width=800px height=100>
 
+### Ejercicio 1 — Filtrado y ordenamiento por precio(de mayor a menor)
 
-## Organización del grupo
-
-Antes de comenzar, los integrantes deberán acordar la distribución del trabajo
-y configurar un repositorio compartido.
-
-1. **Crear un único fork:** un integrante deberá crear el fork de este repositorio en la cuenta que utilizará el grupo.
-2. **Configurar los colaboradores:** el propietario del fork deberá agregar al resto de los integrantes con los permisos necesarios.
-3. **Distribuir los ejercicios:** cada integrante deberá seleccionar un ejercicio diferente. No se permite que dos integrantes resuelvan el mismo ejercicio.
-4. **Implementar y compartir los cambios:** cada integrante deberá subir su implementación al repositorio del grupo, utilizando el workflow de Git acordado.
-5. **Preparar la entrega:** el grupo deberá abrir un único Pull Request desde el fork compartido hacia la rama `main` de este repositorio.
-
-El Pull Request deberá incluir tantos ejercicios resueltos como integrantes
-tenga el grupo. Por ejemplo, un grupo de cinco integrantes deberá entregar
-cinco ejercicios.
-
-**Requisito obligatorio:** entre los ejercicios seleccionados por el grupo, deberá incluirse al menos uno de los siguientes: 3, 9 o 10.
-
-> Algunos ejercicios pueden requerir modificar clases adicionales a la capa  de servicios, por ejemplo, para implementar o sobrescribir el método `equals()`.
-
-## Cómo entregar el trabajo (Pull Request)
-
-1. Realizar un **fork** de este repositorio a la cuenta propia o a la de uno de los
-   integrantes del grupo.
-2. Clonar el fork e implementar los ejercicios que se hayan decidido resolver.
-3. Confirmar los cambios (`commit`) y enviarlos al fork (`push`).
-4. Abrir un Pull Request desde el fork hacia la rama `main` de **este** repositorio.
-   GitHub completará automáticamente la descripción con la plantilla de
-   `.github/PULL_REQUEST_TEMPLATE.md`.
-5. Reemplazar `{}` en el título de la descripción (`# Grupo {}`) por el número de
-   grupo correspondiente.
-6. **Marcar con una `x` únicamente los ejercicios implementados:**
-
-   ```markdown
-   - [x] Ejercicio 1 — Filtrado y ordenamiento por precio
-   - [ ] Ejercicio 2 — Agrupamiento y promedio por compañía
-   ```
-
-   No debe eliminarse el texto `Ejercicio N` de cada línea ni modificarse los
-   números: el CI utiliza ese texto para determinar a qué ejercicio corresponde
-   cada casillero.
-
-7. El workflow de CI (`.github/workflows/maven-tests.yml`) realizará lo siguiente:
-   - Ejecutar toda la batería de tests.
-   - Revisar el checklist y exigir que **cada ejercicio marcado pase todos sus
-     tests**. Un ejercicio marcado que continúe sin implementarse (o esté mal
-     implementado) hará fallar el CI.
-   - Ignorar por completo los ejercicios sin marcar, aunque sus tests fallen.
-   - Publicar una tabla con el resultado de cada ejercicio en el resumen de la
-     ejecución (pestaña *Actions* → ejecución correspondiente → *Summary*).
-
-8. Si se envían nuevos cambios o se edita el PR para marcar más ejercicios, el CI se
-   ejecutará nuevamente de forma automática.
-
-### Importante
-
-- No deben modificarse las firmas de los métodos ni las clases ya existentes en `domain` o `exception`.
-- No deben modificarse los archivos de test.
-
-
----
-
-## Ejercicios
-
-> En algunos ejercicios el método recibe listas de objetos directamente como
-> parámetro; se trata de una simplificación intencional para centrar el ejercicio en
-> la lógica del service. En los Ejercicios 3, 9 y 10 también debe completarse una
-> implementación de DAO (Parte A) además del método de servicio (Parte B).
-
-### Ejercicio 1 — Filtrado y ordenamiento por precio
-
-```java
+```java 
    ReservationService.getReservationsByUser(List<Reservation>, String username, UserDao)
 ```
-
-Debe devolver únicamente las reservas del usuario indicado, ordenadas por precio
-calculado (`reservation.calculatePrice()`) de mayor a menor. Si el usuario no existe
-en el `UserDao`, debe lanzarse `UserNotFoundException`. Se debe utilizar streams y
-lambdas.
-
 ### Ejercicio 2 — Agrupamiento y promedio por compañía
 
 ```java
    TouristServiceService.getAveragePriceByCompany(List<TouristService>, String company)
 ```
-
-Debe devolver el precio promedio (`service.calculatePrice()`) de los servicios de una
-compañía dada, con comparación case-insensitive. Si ningún servicio pertenece a esa
-compañía, debe lanzarse `ServiceNotFoundException`.
-
 ### Ejercicio 3 — Top N reservas más caras en un rango de fechas
 
-**Parte A (DAO):**
+**Parte A (DAO):** rango de fechas
 
 ```java
    ReservationDaoFileImpl.findByDateRange(Instant from, Instant to)
 ```
 
-debe devolver las reservas guardadas cuya fecha se encuentre dentro del rango
-(inclusive en ambos extremos). El filtro por fecha debe realizarse **únicamente** en
-el DAO.
-
-**Parte B (Service):**
+**Parte B (Service):** reservas mas caras de forma descendente
 
 ```java
    ReservationService.getTopNMostExpensive(ReservationDao, Instant from, Instant to, int n)
 ```
-
-Debe validarse el rango (`InvalidDateRangeException` si `from`/`to` son `null` o si
-`from` es posterior a `to`), invocar al DAO y devolver las `n` reservas más caras
-ordenadas de forma descendente. Si `n <= 0`, debe devolverse una lista vacía **sin**
-invocar al DAO. Si existen menos de `n` reservas, deben devolverse todas.
-
 ### Ejercicio 4 — Ordenamiento compuesto de vuelos con enriquecimiento desde DAO
 
 ```java
    TouristServiceService.getFlightsSortedByPriceThenAirline(List<String> flightNumbers, FlightDao)
 ```
-
-Debe recuperarse cada vuelo del DAO por número y devolverse la lista ordenada por
-precio calculado ascendente y, en caso de empate, por aerolínea en orden alfabético
-(`Comparator.comparing(...).thenComparing(...)`). Si algún número no existe, debe
-lanzarse `FlightNotFoundException`.
+ Debe recuperarse cada vuelo del DAO por número y devolverse la lista ordenada por precio calculado ascendente y, en caso de empate, por aerolínea en orden alfabético
 
 ### Ejercicio 5 — Agrupamiento de reservas por país del servicio
 
@@ -143,11 +52,7 @@ lanzarse `FlightNotFoundException`.
    ReservationService.groupReservationsByCountry(List<Reservation>)
 ```
 
-Debe agruparse las reservas por país de la ubicación del servicio
-(`Accommodation.getLocation()` o `Flight.getArrivalInfo()`, utilizando `instanceof`
-con pattern matching) y, dentro de cada grupo, ordenarlas por fecha ascendente. Deben
-ignorarse las reservas cuyo servicio no tenga ubicación asignada. Se debe utilizar
-`Collectors.groupingBy`.
+Dentro de cada grupo, ordenarlas por fecha ascendente. 
 
 ### Ejercicio 6 — Búsqueda de usuario con validación de perfil completo
 
@@ -156,8 +61,7 @@ ignorarse las reservas cuyo servicio no tenga ubicación asignada. Se debe utili
 ```
 
 Debe buscarse al usuario y validarse que posea `address` con `country` y `city` no
-nulos ni vacíos/en blanco. Debe lanzarse `UserNotFoundException` si no existe, o
-`IncompleteUserException` si el perfil está incompleto.
+nulos ni vacíos/en blanco. 
 
 ### Ejercicio 7 — Creación de reserva con validación completa y manejo de fallo en persistencia
 
@@ -165,8 +69,7 @@ nulos ni vacíos/en blanco. Debe lanzarse `UserNotFoundException` si no existe, 
    ReservationService.createReservation(String username, String flightNumber, Instant date, UserDao, FlightDao, ReservationDao)
 ```
 
-Deben validarse el usuario, el vuelo y que la fecha no sea nula ni anterior al
-momento actual (`InvalidDateRangeException`), construir la reserva con
+construir la reserva con
 `Reservation.Builder` y persistirla. Si `save()` lanza `DataAccessException`, esta no
 debe propagarse tal cual: debe envolverse en una nueva `DataAccessException` cuyo
 mensaje incluya el username y el flightNumber.
@@ -178,8 +81,7 @@ mensaje incluya el username y el flightNumber.
 ```
 
 Si ya existe una reserva con el mismo `user.getId()` y `service.getId()`, debe
-lanzarse `DuplicateReservationException`. Caso contrario, debe persistirse con el DAO
-y devolverse la reserva.
+lanzarse `DuplicateReservationException`.
 
 ### Ejercicio 9 — Lectura de archivo y cruce con DAO
 
@@ -250,3 +152,4 @@ sin detener el proceso. Si el `UserDao` lanza `DataAccessException`, esta sí de
 propagarse (fallo total). Debe devolverse un `ValidationResultDTO` con los candidatos
 válidos y los errores acumulados.
 
+---
