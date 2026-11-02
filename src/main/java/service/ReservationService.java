@@ -19,6 +19,7 @@ import repository.dao.UserDao;
 import util.Pair;
 
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -69,14 +70,33 @@ public class ReservationService {
   public List<Reservation> getReservationsByUser(
       List<Reservation> reservations, String username, UserDao userDao)
       throws UserNotFoundException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 1: implement getReservationsByUser");
+       userDao.findByUsername(username).orElseThrow(() -> new UserNotFoundException(username));
+
+    return reservations.stream()
+            .filter(r -> r.getOwner().getUsername().equals(username))
+            .sorted(Comparator.comparingDouble(Reservation::calculatePrice).reversed())
+            .toList();
   }
 
   // Ejercicio 3
   public List<Reservation> getTopNMostExpensive(
-      ReservationDao reservationDao, Instant from, Instant to, int n)
-      throws InvalidDateRangeException, DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement getTopNMostExpensive");
+          ReservationDao reservationDao, Instant from, Instant to, int n)
+          throws InvalidDateRangeException, DataAccessException {
+
+    if (from == null || to == null || from.isAfter(to)) {
+      throw new InvalidDateRangeException("Las fechas no pueden ser nulas y el inicio no puede ser posterior al fin");
+    }
+
+    if (n <= 0) {
+      return java.util.Collections.emptyList();
+    }
+
+    List<Reservation> reservations = reservationDao.findByDateRange(from, to);
+
+    return reservations.stream()
+            .sorted(java.util.Comparator.comparing(Reservation::calculatePrice).reversed())
+            .limit(n)
+            .toList(); // Usa .collect(java.util.stream.Collectors.toList()) si usas una versión de Java anterior a la 16
   }
 
   // Ejercicio 5

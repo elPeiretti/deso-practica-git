@@ -49,8 +49,56 @@ public class ReservationDaoFileImpl implements ReservationDao {
   }
 
   // Ejercicio 3 (Parte A)
+  // Ejercicio 3 (Parte A)
   @Override
   public List<Reservation> findByDateRange(Instant from, Instant to) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 3: implement findByDateRange");
+    List<Reservation> result = new java.util.ArrayList<>();
+    if (!file.exists()) {
+      return result;
+    }
+
+    try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
+      String line;
+      while ((line = br.readLine()) != null) {
+        if (line.trim().isEmpty()) continue;
+
+        String[] data = line.split(",");
+        Instant date = Instant.parse(data[3]);
+
+        // Comprobar rango inclusivo (que no sea anterior a 'from' ni posterior a 'to')
+        if (!date.isBefore(from) && !date.isAfter(to)) {
+          Long id = Long.parseLong(data[0]);
+          java.util.UUID serviceId = java.util.UUID.fromString(data[1]);
+          java.util.UUID ownerId = java.util.UUID.fromString(data[2]);
+
+          // 1. Instanciar User vacío con Builder usando la ruta completa
+          domain.User dummyUser = domain.User.builder().id(ownerId).build();
+
+          // 2. Instanciar TouristService usando la ruta completa
+          domain.TouristService dummyService = new domain.TouristService(serviceId, "dummy") {
+            @Override
+            public double calculatePrice() {
+              return 0.0;
+            }
+          };
+
+          // 3. Construir la reserva (Reservation ya estaba importado en la cabecera)
+          Reservation reservation = new Reservation.Builder()
+                  .id(id)
+                  .service(dummyService)
+                  .owner(dummyUser)
+                  .date(date)
+                  .build();
+
+          result.add(reservation);
+        }
+      }
+    } catch (java.io.IOException e) {
+      throw new DataAccessException("Error de lectura E/S en el archivo de reservas", e);
+    } catch (RuntimeException e) {
+      throw new DataAccessException("Error de formato de datos en el archivo de reservas", e);
+    }
+
+    return result;
   }
 }
