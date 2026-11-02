@@ -11,10 +11,14 @@ import java.util.List;
 public class TouristServiceService {
 
   // Ejercicio 2
-  public double getAveragePriceByCompany(List<TouristService> services, String company)
-      throws ServiceNotFoundException {
-    throw new UnsupportedOperationException("Ejercicio 2: implement getAveragePriceByCompany");
-  }
+public double getAveragePriceByCompany(List<TouristService> services, String company) 
+throws ServiceNotFoundException {
+    return services.stream()
+            .filter(service -> service.getCompany().equalsIgnoreCase(company))
+            .mapToDouble(TouristService::calculatePrice)
+            .average()
+            .orElseThrow(() -> new ServiceNotFoundException("No se encontraron servicios para esta compañía"));
+}
 
   // Ejercicio 4
   public List<Flight> getFlightsSortedByPriceThenAirline(

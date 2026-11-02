@@ -5,6 +5,10 @@ import exception.DataAccessException;
 
 import java.io.File;
 import java.util.List;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Locale;
 
 public class ReservationExportDaoImpl implements ReservationExportDao {
   private final File file;
@@ -21,6 +25,23 @@ public class ReservationExportDaoImpl implements ReservationExportDao {
   // Ejercicio 10 (Parte A)
   @Override
   public void exportAll(List<Reservation> reservations) throws DataAccessException {
-    throw new UnsupportedOperationException("Ejercicio 10: implement exportAll");
+    try (PrintWriter writer = new PrintWriter(new FileWriter(file))) {
+
+      writer.println("reservationId,date,ownerUsername,serviceCompany,calculatedPrice");
+
+      for (Reservation r : reservations) {
+        String line = String.format(Locale.US, "%s,%s,%s,%s,%.2f",
+                r.getId(),
+                r.getDate().toString(),
+                r.getOwner().getUsername(),
+                r.getService().getCompany(),
+                r.calculatePrice()
+        );
+        writer.println(line);
+      }
+
+    } catch (IOException e) {
+      throw new DataAccessException("Error exporting reservations to CSV", e);
+    }
   }
 }
